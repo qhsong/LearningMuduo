@@ -27,7 +27,7 @@ using namespace muduo;
 class Foo {
 	public:
 		void doit() const;
-}
+};
 
 MutexLock mutex;
 std::vector<Foo> foos;

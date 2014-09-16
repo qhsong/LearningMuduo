@@ -28,12 +28,12 @@ class Foo {
 		void doit() const;
 };
 
-typedef std::vector<Foo> Foolist;
-typedef boost::shared_ptr<Foolist> FooListPtr;
+typedef std::vector<Foo> FooList;
+typedef boost::shared_ptr<FooList> FooListPtr;
 
 FooListPtr g_foos;
 MutexLock mutex;
-
+/*
 void post(const Foo& f) {
 	printf("post\n");
 	MutexLockGuard lock(mutex);
@@ -43,6 +43,15 @@ void post(const Foo& f) {
 	}
 	assert(g_foos.unique());
 	g_foos->push_back(f);
+}
+*/
+void post(const Foo& f) {
+	printf("post\n");
+	FooListPtr newFoos(new FooList(*g_foos));
+	newFoos->push_back(f);
+	MutexLockGuard lock(mutex);
+	printf("Copy the new list\n");
+	g_foos = newFoos;
 }
 
 void traverse() {
@@ -60,6 +69,7 @@ void traverse() {
 	}
 }
 
+
 void Foo::doit() const {
 	Foo f;
 	post(f);
@@ -67,7 +77,8 @@ void Foo::doit() const {
 
 int main() {
 	g_foos.reset(new FooList);
-	Foo f;
+	Foo f,g;
 	post(f);
+	post(g);
 	traverse();
 }
